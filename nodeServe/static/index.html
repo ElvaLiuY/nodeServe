@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>test</title>
+</head>
+
+<body>
+  <h1>测试static下面的web页</h1>
+  <button id='proxySend'>接口转发</button>
+  <button id="send">请求</button>
+  <button id="sendPost">请求Post</button>
+  <p id="showText"></p>
+</body>
+<script src="./js/jquery-3.3.1.min.js"></script>
+<script>
+  // import $ from 'jquery'
+  // var $ = require('jquery')
+  window.onload = function () {
+    var proxyState = null
+    getProxyState()
+    $('#proxySend').on('click', function () {
+      setProxyState(!proxyState)
+    })
+    $('#send').click(function () {
+      $.ajax({
+        type: 'get',
+        url: '/mock/test',
+        success: function (data) {
+          console.log(data)
+          var str = ''
+          str = proxyState ? '转发' : '' 
+          $('#showText').html(str + 'get请求：' + data.data.string)
+        }
+      })
+    })
+    $('#sendPost').click(function () {
+      $.ajax({
+        type: 'post',
+        url: '/mock/testPost',
+        success: function (data) {
+          console.log('post', data)
+          var str = ''
+          str = proxyState ? '转发' : ''
+          $('#showText').html(str + 'post请求：' + data.data.string)
+        }
+      })
+    })
+    function getProxyState() {
+      $.ajax({
+        type: 'get',
+        url: '/admin/proxy',
+        success: function (data) {
+          proxyState = data.proxyState
+        }
+      })
+    }
+    function setProxyState(bool) {
+      $.ajax({
+        type: 'post',
+        url: '/admin/proxy',
+        data: { state: bool },
+        success: function (data) {
+          proxyState = bool
+          console.log(bool)
+        }
+      })
+    }
+  }
+</script>
+
+</html>
